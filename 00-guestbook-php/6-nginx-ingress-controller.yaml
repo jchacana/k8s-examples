@@ -14,7 +14,7 @@ spec:
         app: nginx-ingress
     spec:
       nodeSelector:
-        role: nginx-ingress
+        role: ingress-node
       containers:
       - image: gcr.io/google_containers/nginx-ingress:0.1
         imagePullPolicy: Always

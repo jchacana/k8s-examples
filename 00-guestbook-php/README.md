@@ -420,15 +420,15 @@ NAME          LABELS                               STATUS    AGE
 159.203.V.W   kubernetes.io/hostname=159.203.V.W   Ready     27m
 ```
 
-and label one of them as the ingress one
+and label one of them as the `ingress node`
 
 ```bash
-$ kubecl label no 104.131.Z.S role=nginx-ingress
+$ kubecl label no 104.131.Z.S role=ingress-node
 
 $ kubectl get no
 NAME          LABELS                                                   STATUS    AGE
 104.131.X.Y   kubernetes.io/hostname=104.131.X.Y                       Ready     24m
-104.131.Z.S   kubernetes.io/hostname=104.131.Z.S, role=nginx-ingress   Ready     24m
+104.131.Z.S   kubernetes.io/hostname=104.131.Z.S, role=ingress-node    Ready     24m
 104.131.T.U   kubernetes.io/hostname=104.131.T.U                       Ready     24m
 159.203.V.W   kubernetes.io/hostname=159.203.V.W                       Ready     27m
 ```
@@ -468,6 +468,10 @@ As there is not an `Ingress` resource deployed, nginx doesn't have anything in i
 ### Ingress Resource
 
 ```bash
-
+kubectl create -f 7-ingress.yaml
 ```
+
+(TODO: Check nginx.conf)
+
+(TODO: Do the curl)
 
