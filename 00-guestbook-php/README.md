@@ -423,7 +423,7 @@ NAME          LABELS                               STATUS    AGE
 and label one of them as the `ingress node`
 
 ```bash
-$ kubecl label no 104.131.Z.S role=ingress-node
+$ kubectl label no 104.131.Z.S role=ingress-node
 
 $ kubectl get no
 NAME          LABELS                                                   STATUS    AGE
