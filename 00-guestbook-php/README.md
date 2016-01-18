@@ -438,7 +438,7 @@ This `role` `label` we added enables us to tell Kubernetes to deploy our contain
 To deploy
 
 ```bash
-kubectl create -f 6-nginx-ingress-controller.yaml
+$ kubectl create -f 6-nginx-ingress-controller.yaml
 ```
 
 We can check several things
@@ -468,10 +468,117 @@ As there is not an `Ingress` resource deployed, nginx doesn't have anything in i
 ### Ingress Resource
 
 ```bash
-kubectl create -f 7-ingress.yaml
+$ kubectl create -f 7-ingress.yaml
 ```
 
-(TODO: Check nginx.conf)
+We check
 
-(TODO: Do the curl)
+```bash
+$ kubectl get ing
+NAME        RULE          BACKEND   ADDRESS
+guestbook   -
+            foo.bar.com
+            /             frontend:80
+```
+
+Note that there is a server name / host specified. This is due that [the ingress controller we are employing](https://github.com/kubernetes/contrib/tree/master/Ingress/controllers/nginx-alpha) requires that particular field defined to work.
+
+We can in the future fork from this ingress controller, to a specific one that does not have this contraint.
+
+Let's check if the ingress controller has updated its configuration
+
+```bash
+$ kubectl exec -ti nginx-ingress-d0fk4 cat nginx.conf
+
+events {
+  worker_connections 1024;
+}
+http {
+
+
+  server {
+    listen 80;
+    server_name foo.bar.com;
+    resolver 127.0.0.1;
+
+    location / {
+      proxy_pass http://frontend;
+    }
+  }
+}
+```
+
+We are set! Finally let's do the curl
+
+```bash
+$ curl http://104.131.Z.S
+<html ng-app="redis">
+  <head>
+    <title>Guestbook</title>
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.12/angular.min.js"></script>
+    <script src="controllers.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.13.0/ui-bootstrap-tpls.js"></script>
+  </head>
+  <body ng-controller="RedisCtrl">
+    <div style="width: 50%; margin-left: 20px">
+      <h2>Guestbook</h2>
+    <form>
+    <fieldset>
+    <input ng-model="msg" placeholder="Messages" class="form-control" type="text" name="input"><br>
+    <button type="button" class="btn btn-primary" ng-click="controller.onRedis()">Submit</button>
+    </fieldset>
+    </form>
+    <div>
+      <div ng-repeat="msg in messages track by $index">
+        {{msg}}
+      </div>
+    </div>
+    </div>
+  </body>
+</html>
+```
+
+## Convenience Executable
+
+To "just test this", just execute
+
+```bash
+$ ./deploy-guestbook.sh
+```
+
+Will export the variable `$K8S_INGRESS_NODE`, which you can use to `curl`
+
+```bash
+$ curl http://$K8S_INGRESS_NODE
+<html ng-app="redis">
+  <head>
+    <title>Guestbook</title>
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.12/angular.min.js"></script>
+    <script src="controllers.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.13.0/ui-bootstrap-tpls.js"></script>
+  </head>
+  <body ng-controller="RedisCtrl">
+    <div style="width: 50%; margin-left: 20px">
+      <h2>Guestbook</h2>
+    <form>
+    <fieldset>
+    <input ng-model="msg" placeholder="Messages" class="form-control" type="text" name="input"><br>
+    <button type="button" class="btn btn-primary" ng-click="controller.onRedis()">Submit</button>
+    </fieldset>
+    </form>
+    <div>
+      <div ng-repeat="msg in messages track by $index">
+        {{msg}}
+      </div>
+    </div>
+    </div>
+  </body>
+</html>
+```
+
+### The End
+
+If you reached this part. Thank you very much for reading.
 
